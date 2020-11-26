@@ -1,0 +1,17 @@
+#NAME: Dhanush Nadella
+#EMAIL: dnadella787@gmail.com	
+#UID: 205150583
+
+Tarball contains two C source modules. The first, lab1b-client.c, creates a client 
+and takes in input from the keyboard and forwards it via a network socket to a 
+server program, lab1b-server.c, which then forwards it a shell child process that 
+is created via a fork. The shell then sends the output of commands back to the server
+which are then sent back to the client and displayed. 
+
+There is an optional --compress flag that makes all communication across the network 
+socket be via compressed data. 
+
+A makefile is also included that has a default target that produces both the client
+and server program. It also has individual targets for the two programs, a clean 
+target to return the directory to an untarred state, and a dist target to produce
+the distribution tarball.

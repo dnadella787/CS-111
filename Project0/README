@@ -1,0 +1,21 @@
+NAME: Dhanush Nadella
+EMAIL: dnadella787@gmail.com
+ID: 205150583
+
+ADDED FILES: smoketest.sh (a shell script utilized in the check target of the Makefile to run tests)
+
+There are 6 test cases that are tested in the smoketest shell script. 
+
+Cases 1-4 are checked alone and also amongst correct flags to see if it 
+makes a difference. 
+
+1A/B: Tests if invalid argument return exit code 1.
+2A/B: Tests if invalid input files return exit code 2.
+3A/B: Tests if invalid output files return exit code 3.
+4A/B: Tests if the segmentation fault is caught and returns exit code 4.
+5A/B: First tests if exit code is 0 for no errors and if the two files are
+the same.
+6A/B: Tests if the appropriate exit code is returned when both the input
+and output files will cause errors. It checks to see if the first error
+on the command line is the one returned. So if the --input flag is first
+then error code should be 2.

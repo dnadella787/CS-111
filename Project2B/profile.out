@@ -1,0 +1,340 @@
+Total: 437 samples
+     423  96.8%  96.8%      437 100.0% start_routine
+       4   0.9%  97.7%        5   1.1% SortedList_insert
+       3   0.7%  98.4%        3   0.7% SortedList_delete
+       2   0.5%  98.9%        2   0.5% 0x00007fffe3fb080e
+       2   0.5%  99.3%        2   0.5% SortedList_lookup
+       1   0.2%  99.5%        1   0.2% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:211
+       1   0.2%  99.8%        1   0.2% 0x00007fffe3fb07d4
+       1   0.2% 100.0%        1   0.2% SortedList_length
+       0   0.0% 100.0%      437 100.0% ?? /usr/src/debug////////glibc-2.17-c758a686/misc/../sysdeps/unix/sysv/linux/x86_64/clone.S:118
+       0   0.0% 100.0%        3   0.7% __GI___clock_gettime
+       0   0.0% 100.0%      437 100.0% start_thread
+ROUTINE ====================== start_routine in /u/eng/class/classdna/111Assignments/Project2B/lab2_list.c
+   423    437 Total samples (flat / cumulative)
+     .      .   33: 
+     .      .   34: pthread_mutex_t restrict_mutex;
+     .      .   35: int lock = 0;
+     .      .   36: 
+     .      .   37: 
+---
+     .      .   38: void *start_routine(void *element){
+     .      .   39:     long long lock_acq_time = 0;
+     .      .   40:     struct timespec starting_time, ending_time;
+     .      .   41:     SortedListElement_t *start_element = (SortedListElement_t *)element;
+     .      .   42:     for (int i = 0; i < num_iterations; i++){
+     .      .   43:         if (mutex_flag == 1){
+     .      .   44:             int time_retval = clock_gettime(CLOCK_MONOTONIC, &starting_time);
+     .      .   45:             if (time_retval < 0){
+     .      .   46:                 fprintf(stderr, "Clock_gettime failed at start.\n");
+     .      .   47:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .   48:                 exit(1);
+     .      .   49:             }
+     .      .   50:             pthread_mutex_lock(&restrict_mutex);
+     .      .   51:             time_retval = clock_gettime(CLOCK_MONOTONIC, &ending_time);
+     .      .   52:             if (time_retval < 0){
+     .      .   53:                 fprintf(stderr, "Clock_gettime failed at end.\n");
+     .      .   54:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .   55:                 exit(1);
+     .      .   56:             }
+     .      .   57:             lock_acq_time += (1000000000 * (ending_time.tv_sec - starting_time.tv_sec)) + (ending_time.tv_nsec - starting_time.tv_nsec);
+     .      .   58:         }
+     1      1   59:         else if (spin_flag == 1){
+     .      .   60:             int time_retval = clock_gettime(CLOCK_MONOTONIC, &starting_time);
+     .      .   61:             if (time_retval < 0){
+     .      .   62:                 fprintf(stderr, "Clock_gettime failed at start.\n");
+     .      .   63:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .   64:                 exit(1);
+     .      .   65:             }
+   220    220   66:             while (__sync_lock_test_and_set(&lock, 1));
+     .      1   67:             time_retval = clock_gettime(CLOCK_MONOTONIC, &ending_time);
+     .      .   68:             if (time_retval < 0){
+     .      .   69:                 fprintf(stderr, "Clock_gettime failed at end.\n");
+     .      .   70:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .   71:                 exit(1);
+     .      .   72:             }
+     .      .   73:             lock_acq_time += (1000000000 * (ending_time.tv_sec - starting_time.tv_sec)) + (ending_time.tv_nsec - starting_time.tv_nsec);
+     .      .   74:         }
+     .      .   75: 
+     .      5   76:         SortedList_insert(list_head, (SortedListElement_t *)(start_element + i));
+     .      .   77:         
+     .      .   78:         if (mutex_flag == 1){
+     .      .   79:             pthread_mutex_unlock(&restrict_mutex);
+     .      .   80:         }
+     .      .   81:         else if (spin_flag == 1) {
+     .      .   82:             __sync_lock_release(&lock);
+     .      .   83:         }
+     .      .   84:     }
+     .      .   85: 
+     .      .   86:     if (mutex_flag == 1){
+     .      .   87:         int time_retval = clock_gettime(CLOCK_MONOTONIC, &starting_time);
+     .      .   88:         if (time_retval < 0){
+     .      .   89:             fprintf(stderr, "Clock_gettime failed at start.\n");
+     .      .   90:             fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .   91:             exit(1);
+     .      .   92:         }
+     .      .   93:         pthread_mutex_lock(&restrict_mutex);
+     .      .   94:         time_retval = clock_gettime(CLOCK_MONOTONIC, &ending_time);
+     .      .   95:         if (time_retval < 0){
+     .      .   96:             fprintf(stderr, "Clock_gettime failed at end.\n");
+     .      .   97:             fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .   98:             exit(1);
+     .      .   99:         }
+     .      .  100:         lock_acq_time += (1000000000 * (ending_time.tv_sec - starting_time.tv_sec)) + (ending_time.tv_nsec - starting_time.tv_nsec);
+     .      .  101:     }
+     .      .  102:     else if (spin_flag == 1){
+     .      .  103:         int time_retval = clock_gettime(CLOCK_MONOTONIC, &starting_time);
+     .      .  104:         if (time_retval < 0){
+     .      .  105:             fprintf(stderr, "Clock_gettime failed at start.\n");
+     .      .  106:             fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .  107:             exit(1);
+     .      .  108:         }
+     .      .  109:         while (__sync_lock_test_and_set(&lock, 1));
+     .      .  110:         time_retval = clock_gettime(CLOCK_MONOTONIC, &ending_time);
+     .      .  111:         if (time_retval < 0){
+     .      .  112:             fprintf(stderr, "Clock_gettime failed at end.\n");
+     .      .  113:             fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .  114:             exit(1);
+     .      .  115:         }
+     .      .  116:         lock_acq_time += (1000000000 * (ending_time.tv_sec - starting_time.tv_sec)) + (ending_time.tv_nsec - starting_time.tv_nsec);
+     .      .  117:     }
+     .      .  118: 
+     .      1  119:     int length = SortedList_length(list_head);
+     .      .  120:     if (length == -1){
+     .      .  121:         fprintf(stderr, "List corrupted, error getting length of SortedList.\n");
+     .      .  122:         exit(2);
+     .      .  123:     }
+     .      .  124: 
+     .      .  125:     if (mutex_flag == 1){
+     .      .  126:         pthread_mutex_unlock(&restrict_mutex);
+     .      .  127:     }
+     .      .  128:     else if (spin_flag == 1) {
+     .      .  129:         __sync_lock_release(&lock);
+     .      .  130:     }
+     .      .  131: 
+     .      .  132:     int delete_return;
+     .      .  133:     SortedListElement_t *lookup_return;
+     .      .  134:     for (int i = 0; i < num_iterations; i++){
+     .      .  135:         if (mutex_flag == 1){
+     .      .  136:             int time_retval = clock_gettime(CLOCK_MONOTONIC, &starting_time);
+     .      .  137:             if (time_retval < 0){
+     .      .  138:                 fprintf(stderr, "Clock_gettime failed at start.\n");
+     .      .  139:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .  140:                 exit(1);
+     .      .  141:             }
+     .      .  142:             pthread_mutex_lock(&restrict_mutex);
+     .      .  143:             time_retval = clock_gettime(CLOCK_MONOTONIC, &ending_time);
+     .      .  144:             if (time_retval < 0){
+     .      .  145:                 fprintf(stderr, "Clock_gettime failed at end.\n");
+     .      .  146:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .  147:                 exit(1);
+     .      .  148:             }
+     .      .  149:             lock_acq_time += (1000000000 * (ending_time.tv_sec - starting_time.tv_sec)) + (ending_time.tv_nsec - starting_time.tv_nsec);
+     .      .  150:         }
+     .      .  151:         else if (spin_flag == 1){
+     .      1  152:             int time_retval = clock_gettime(CLOCK_MONOTONIC, &starting_time);
+     .      .  153:             if (time_retval < 0){
+     .      .  154:                 fprintf(stderr, "Clock_gettime failed at start.\n");
+     .      .  155:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .  156:                 exit(1);
+     .      .  157:             }
+   202    202  158:             while (__sync_lock_test_and_set(&lock, 1));
+     .      1  159:             time_retval = clock_gettime(CLOCK_MONOTONIC, &ending_time);
+     .      .  160:             if (time_retval < 0){
+     .      .  161:                 fprintf(stderr, "Clock_gettime failed at end.\n");
+     .      .  162:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .  163:                 exit(1);
+     .      .  164:             }
+     .      .  165:             lock_acq_time += (1000000000 * (ending_time.tv_sec - starting_time.tv_sec)) + (ending_time.tv_nsec - starting_time.tv_nsec);
+     .      .  166:         }
+     .      .  167: 
+     .      2  168:         lookup_return = SortedList_lookup(list_head, (start_element + i)->key);
+     .      .  169:         if (lookup_return == NULL){
+     .      .  170:             fprintf(stderr, "List corrupted, element that should be there not found.\n");
+     .      .  171:             exit(2);
+     .      .  172:         }
+     .      3  173:         delete_return = SortedList_delete(lookup_return);
+     .      .  174:         if (delete_return == 1){
+     .      .  175:             fprintf(stderr, "List corrupted, element found but couldn't be deleted.\n");
+     .      .  176:             exit(2);
+     .      .  177:         }
+     .      .  178: 
+     .      .  179:         if (mutex_flag == 1){
+     .      .  180:             pthread_mutex_unlock(&restrict_mutex);
+     .      .  181:         }
+     .      .  182:         else if (spin_flag == 1) {
+     .      .  183:             __sync_lock_release(&lock);
+     .      .  184:         }
+     .      .  185:     }
+     .      .  186: 
+     .      .  187:     pthread_exit((void *)lock_acq_time);
+---
+     .      .  188: }
+     .      .  189: 
+     .      .  190: 
+     .      .  191: 
+     .      .  192: void segfault_handler(){
+ROUTINE ====================== start_routine in /u/eng/class/classdna/111Assignments/Project2B/lab2_list.c
+   423    437 Total samples (flat / cumulative)
+     .      .   33: 
+     .      .   34: pthread_mutex_t restrict_mutex;
+     .      .   35: int lock = 0;
+     .      .   36: 
+     .      .   37: 
+---
+     .      .   38: void *start_routine(void *element){
+     .      .   39:     long long lock_acq_time = 0;
+     .      .   40:     struct timespec starting_time, ending_time;
+     .      .   41:     SortedListElement_t *start_element = (SortedListElement_t *)element;
+     .      .   42:     for (int i = 0; i < num_iterations; i++){
+     .      .   43:         if (mutex_flag == 1){
+     .      .   44:             int time_retval = clock_gettime(CLOCK_MONOTONIC, &starting_time);
+     .      .   45:             if (time_retval < 0){
+     .      .   46:                 fprintf(stderr, "Clock_gettime failed at start.\n");
+     .      .   47:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .   48:                 exit(1);
+     .      .   49:             }
+     .      .   50:             pthread_mutex_lock(&restrict_mutex);
+     .      .   51:             time_retval = clock_gettime(CLOCK_MONOTONIC, &ending_time);
+     .      .   52:             if (time_retval < 0){
+     .      .   53:                 fprintf(stderr, "Clock_gettime failed at end.\n");
+     .      .   54:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .   55:                 exit(1);
+     .      .   56:             }
+     .      .   57:             lock_acq_time += (1000000000 * (ending_time.tv_sec - starting_time.tv_sec)) + (ending_time.tv_nsec - starting_time.tv_nsec);
+     .      .   58:         }
+     1      1   59:         else if (spin_flag == 1){
+     .      .   60:             int time_retval = clock_gettime(CLOCK_MONOTONIC, &starting_time);
+     .      .   61:             if (time_retval < 0){
+     .      .   62:                 fprintf(stderr, "Clock_gettime failed at start.\n");
+     .      .   63:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .   64:                 exit(1);
+     .      .   65:             }
+   220    220   66:             while (__sync_lock_test_and_set(&lock, 1));
+     .      1   67:             time_retval = clock_gettime(CLOCK_MONOTONIC, &ending_time);
+     .      .   68:             if (time_retval < 0){
+     .      .   69:                 fprintf(stderr, "Clock_gettime failed at end.\n");
+     .      .   70:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .   71:                 exit(1);
+     .      .   72:             }
+     .      .   73:             lock_acq_time += (1000000000 * (ending_time.tv_sec - starting_time.tv_sec)) + (ending_time.tv_nsec - starting_time.tv_nsec);
+     .      .   74:         }
+     .      .   75: 
+     .      5   76:         SortedList_insert(list_head, (SortedListElement_t *)(start_element + i));
+     .      .   77:         
+     .      .   78:         if (mutex_flag == 1){
+     .      .   79:             pthread_mutex_unlock(&restrict_mutex);
+     .      .   80:         }
+     .      .   81:         else if (spin_flag == 1) {
+     .      .   82:             __sync_lock_release(&lock);
+     .      .   83:         }
+     .      .   84:     }
+     .      .   85: 
+     .      .   86:     if (mutex_flag == 1){
+     .      .   87:         int time_retval = clock_gettime(CLOCK_MONOTONIC, &starting_time);
+     .      .   88:         if (time_retval < 0){
+     .      .   89:             fprintf(stderr, "Clock_gettime failed at start.\n");
+     .      .   90:             fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .   91:             exit(1);
+     .      .   92:         }
+     .      .   93:         pthread_mutex_lock(&restrict_mutex);
+     .      .   94:         time_retval = clock_gettime(CLOCK_MONOTONIC, &ending_time);
+     .      .   95:         if (time_retval < 0){
+     .      .   96:             fprintf(stderr, "Clock_gettime failed at end.\n");
+     .      .   97:             fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .   98:             exit(1);
+     .      .   99:         }
+     .      .  100:         lock_acq_time += (1000000000 * (ending_time.tv_sec - starting_time.tv_sec)) + (ending_time.tv_nsec - starting_time.tv_nsec);
+     .      .  101:     }
+     .      .  102:     else if (spin_flag == 1){
+     .      .  103:         int time_retval = clock_gettime(CLOCK_MONOTONIC, &starting_time);
+     .      .  104:         if (time_retval < 0){
+     .      .  105:             fprintf(stderr, "Clock_gettime failed at start.\n");
+     .      .  106:             fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .  107:             exit(1);
+     .      .  108:         }
+     .      .  109:         while (__sync_lock_test_and_set(&lock, 1));
+     .      .  110:         time_retval = clock_gettime(CLOCK_MONOTONIC, &ending_time);
+     .      .  111:         if (time_retval < 0){
+     .      .  112:             fprintf(stderr, "Clock_gettime failed at end.\n");
+     .      .  113:             fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .  114:             exit(1);
+     .      .  115:         }
+     .      .  116:         lock_acq_time += (1000000000 * (ending_time.tv_sec - starting_time.tv_sec)) + (ending_time.tv_nsec - starting_time.tv_nsec);
+     .      .  117:     }
+     .      .  118: 
+     .      1  119:     int length = SortedList_length(list_head);
+     .      .  120:     if (length == -1){
+     .      .  121:         fprintf(stderr, "List corrupted, error getting length of SortedList.\n");
+     .      .  122:         exit(2);
+     .      .  123:     }
+     .      .  124: 
+     .      .  125:     if (mutex_flag == 1){
+     .      .  126:         pthread_mutex_unlock(&restrict_mutex);
+     .      .  127:     }
+     .      .  128:     else if (spin_flag == 1) {
+     .      .  129:         __sync_lock_release(&lock);
+     .      .  130:     }
+     .      .  131: 
+     .      .  132:     int delete_return;
+     .      .  133:     SortedListElement_t *lookup_return;
+     .      .  134:     for (int i = 0; i < num_iterations; i++){
+     .      .  135:         if (mutex_flag == 1){
+     .      .  136:             int time_retval = clock_gettime(CLOCK_MONOTONIC, &starting_time);
+     .      .  137:             if (time_retval < 0){
+     .      .  138:                 fprintf(stderr, "Clock_gettime failed at start.\n");
+     .      .  139:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .  140:                 exit(1);
+     .      .  141:             }
+     .      .  142:             pthread_mutex_lock(&restrict_mutex);
+     .      .  143:             time_retval = clock_gettime(CLOCK_MONOTONIC, &ending_time);
+     .      .  144:             if (time_retval < 0){
+     .      .  145:                 fprintf(stderr, "Clock_gettime failed at end.\n");
+     .      .  146:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .  147:                 exit(1);
+     .      .  148:             }
+     .      .  149:             lock_acq_time += (1000000000 * (ending_time.tv_sec - starting_time.tv_sec)) + (ending_time.tv_nsec - starting_time.tv_nsec);
+     .      .  150:         }
+     .      .  151:         else if (spin_flag == 1){
+     .      1  152:             int time_retval = clock_gettime(CLOCK_MONOTONIC, &starting_time);
+     .      .  153:             if (time_retval < 0){
+     .      .  154:                 fprintf(stderr, "Clock_gettime failed at start.\n");
+     .      .  155:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .  156:                 exit(1);
+     .      .  157:             }
+   202    202  158:             while (__sync_lock_test_and_set(&lock, 1));
+     .      1  159:             time_retval = clock_gettime(CLOCK_MONOTONIC, &ending_time);
+     .      .  160:             if (time_retval < 0){
+     .      .  161:                 fprintf(stderr, "Clock_gettime failed at end.\n");
+     .      .  162:                 fprintf(stderr, "Error: %s.\n", strerror(errno));
+     .      .  163:                 exit(1);
+     .      .  164:             }
+     .      .  165:             lock_acq_time += (1000000000 * (ending_time.tv_sec - starting_time.tv_sec)) + (ending_time.tv_nsec - starting_time.tv_nsec);
+     .      .  166:         }
+     .      .  167: 
+     .      2  168:         lookup_return = SortedList_lookup(list_head, (start_element + i)->key);
+     .      .  169:         if (lookup_return == NULL){
+     .      .  170:             fprintf(stderr, "List corrupted, element that should be there not found.\n");
+     .      .  171:             exit(2);
+     .      .  172:         }
+     .      3  173:         delete_return = SortedList_delete(lookup_return);
+     .      .  174:         if (delete_return == 1){
+     .      .  175:             fprintf(stderr, "List corrupted, element found but couldn't be deleted.\n");
+     .      .  176:             exit(2);
+     .      .  177:         }
+     .      .  178: 
+     .      .  179:         if (mutex_flag == 1){
+     .      .  180:             pthread_mutex_unlock(&restrict_mutex);
+     .      .  181:         }
+     .      .  182:         else if (spin_flag == 1) {
+     .      .  183:             __sync_lock_release(&lock);
+     .      .  184:         }
+     .      .  185:     }
+     .      .  186: 
+     .      .  187:     pthread_exit((void *)lock_acq_time);
+---
+     .      .  188: }
+     .      .  189: 
+     .      .  190: 
+     .      .  191: 
+     .      .  192: void segfault_handler(){

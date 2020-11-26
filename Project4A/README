@@ -1,0 +1,33 @@
+#NAME: Dhanush Nadella
+#EMAIL: dnadella787@gmail.com
+#UID: 205150583
+
+Beaglebone serial number: BBGW19010739
+WIFI MAC Address: 2CF7F1062B7
+
+Other Contents:
+
+my_beaglebone.jpg: selfie with me and the beaglebone
+
+connected.jpg: screenshot of me using PuTTY to access the Beaglebonem which was
+connected to my laptop via the provided USB mini to USB 3.0 cable. I also changed
+the name according to the tutorial given in the spec and then rebooted the device
+to make the name show accordingly. Although, I was not able to get the full name 
+of 205150584.lasr.cs.ucla.edu to show; I could only get my UID to show, hence the 
+debian@205150583 for the terminal prompt. It also shows the output of running ifconfig.
+
+copy.png: screenshot of me using scp command to move a simple hello world program,
+called hw.c, to the beaglebone. From here on out I used WSL on my windows machine 
+to SSH into the Beaglebone over wifi. I also tested out FileZilla as per the tutorial
+given in the spec but preferred using WinSCP since I have been using it since 35L. It
+also supports the SFTP option. 
+
+build_run.png: screenshot of me building the hw.c using gcc into the executable hw 
+and then running it. I then ran it and it outputted "hello world" 
+
+git.png: screenshot of me cloning my own git repo to the Beaglebone. The repo I 
+cloned was called Argparser-for-CPP. I did not have to use apt-get to install git
+as it was already on my Beaglebone. Thus, I did not include me downloading it in 
+the screenshot.
+
+Makefile: builds the tarball for submission

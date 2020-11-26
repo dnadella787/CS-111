@@ -1,0 +1,27 @@
+NAME: Dhanush Nadella
+EMAIL: dnadella787@gmail.com
+ID: 205150583
+
+
+lab1a.c is a C source module that uses system calls for interprocess communication. First,
+the program will parse all command line arguments as needed (--shell=PROGRAM) is supported.
+Then, it will set the terminal into character-at-a-time, no-echo mode (non-canonical, no echo)
+while saving the previous terminal settings to reset at exit. If the --shell flag is not specified,
+simply read and write to stdin and stdout using read(2) and write(2) with special considerations
+for <lf> and <cr>. If the --shell flag is used, pipes are setup between the shell and terminal and 
+also dup'd after closing stdin, stdout, and stderr as needed in the parent/child process. The 
+program then reads/writes appropriately using the poll(2) system call. Lastly, the process status
+of the child is monitored and displayed before exiting.
+
+Makefile is a standard makefile that supports the default target to create the lab1a executable
+as per the spec, clean target that returns the current directory to a state before the tar and 
+executable creation, and a dist target that produces the tar ball for submitting.
+
+
+A note about exec. When I tried to call execl via "execl(shell_program, (char *)NULL)," as per the
+discussion I would receive a warning saying "Not enough arguments to fit a sentinel." After searching
+online, I tested out "execl(shell_program, shell_program, (char *)NULL)" wherein shell_program
+is the PROGRAM passed in via the --shell flag and is set by optarg.
+
+https://stackoverflow.com/questions/3816778/not-enough-variables-to-fit-a-sentinel
+

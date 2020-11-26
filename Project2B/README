@@ -1,0 +1,133 @@
+NAME: Dhanush Nadella
+UID: 205150583
+EMAIL: dnadella787@gmail.com
+
+NOTES:
+ - I removed some of the tests that were repeats because it was
+   causing my graphs to have multiple lines, these tests are 
+   pointed out in tests.sh 
+ - When running my "make profile" target I would only get 3 samples
+   in my profile.out, so as the TA suggested, I increases the 
+   number of iterations to 10000 from just 1000 and got 437 samples 
+
+
+Included Files:
+
+(all relavent research is included in each file it was used in)
+
+SortedList.h - header received in project 2a
+SortedList.c - same source file I submitted for project 2a
+lab2_list.c - editted lab2_list.c from project 2a with additions as per spec 
+test.sh - bash script to run the needed tests for the graphs 
+lab2b_list.csv - where the output from all the tests goes 
+lab2b.gp - script to produce graphs, based on lab2_list.gp from project 2a 
+lab2b_[1-5].png - images produced my script and graph target as per spec 
+README - this file, info on included files and answers to questions 
+Makefile - supports default, dist, clean, graphs, tests and profile target
+
+
+Question 2.3.1:
+
+I think for the list tests with just 1 or 2 threads, most of the time 
+was spent by the CPU trying to manipulate/traverse the linked list using 
+insert, delete, lookup, and count functions. This is because these 
+functions have a lot of memory references to deal with since the objects
+are all malloc'd. So the CPU constantly is going to the RAM to actually 
+execute the actions it wants to on the list.
+
+The most expensive parts of the code are probably the manipulation/traversal
+functions in the linked list for the reasons described above. 
+
+Increasing the number of threads means more threads will be waiting to 
+obtain a lock to a critical section while only one thread has it. So 
+majority of the time will be spent by the CPU on simply spin locking
+cycles off while waiting for the high thread spin-lock tests. For the 
+high thread mutex tests, majority of the time will be spent by the CPU 
+on context switches because everytime a thread cannot obtain a lock 
+because another thread already has it, it will be blocked until the 
+thread is available, at which point it must be rescheduled. 
+
+
+Question 2.3.2:
+
+The lines taking up most of the CPU time during the spin lock test 
+are the ones corresponding to the actual spin lock testing portion.
+The relavent lines in profile.out are:
+
+     .      .   65:             }
+   220    220   66:             while (__sync_lock_test_and_set(&lock, 1));
+     .      1   67:             time_retval = clock_gettime(CLOCK_MONOTONIC, &ending_time);
+
+     and 
+
+     .      .  157:             }
+   202    202  158:             while (__sync_lock_test_and_set(&lock, 1));
+     .      1  159:             time_retval = clock_gettime(CLOCK_MONOTONIC, &ending_time);
+
+This makes sense as this line is checking if the lock is held or not,
+and if it is, the lock will simply spin, burning off CPU cycles while
+doing nothing but waiting for the lock to be released by another thread.
+
+This operation becomes more expensive with a large number of threads
+because as you increase the number of threads, the amount of threads that
+can obtain a lock stays the same (its 1) while the number of locks that
+must wait on that one thread increases (its n-1). So as the number of threads
+increases, the number of threads that try to obtain a lock on a critical 
+section that is already held also increases causing all those threads to 
+simply wastefully spin and burn off CPU cycles while waiting to get a lock,
+and even then only one can obtain the lock. 
+
+
+Question 2.3.3:
+
+The average lock-wait time rises dramatically as the number of threads
+also increases for the same reason explained above. As you have more 
+threads, you have more threads that are "fighting" to obtain a lock to 
+a critical section of code that they would also like to perform. But,
+as the number of threads increases, the number of threads that can hold
+the lock does not, causing more and more threads to wait. Additionally,
+the marginal benefit of unlocking is lower per thread as only one thread
+can obtain the lock afterwrds. So the majority of the threads, are left
+still waiting. 
+
+The average completion time per operation rises, but less dramatically, 
+as the number of contending threads also increases because even though
+several threads will be waiting, at least one thread will have the lock,
+and thus will be able to perform the desired list operations. Thus,
+the average completition time rises as the number of threads, but less 
+so because at least one thread at a time will be allowed to proceed.
+
+The wait time per operation goes up faster than the average completion 
+time per operation because of two possible reasons. First, the wait 
+time on locking becomes less and less significant compared to the amount
+of time doing actual list manipulation/traversal as the number of 
+threads increase, and thus the number of operations increase. Or second,
+the wait time per operation is bloated and slightly miss counted in our
+method because we count per thread. The threads could be running at 
+the same time so there might be overlap in wait times. Thus, it could
+be double or more counting the seconds. 
+
+
+Question 2.3.4:
+
+As the number of number of lists increase, the synchronization methods
+perform better because now a single thread holds the lock to a critical 
+section operating on a single list, so the more lists you have, as long 
+as the other threads are trying to access the other lists, there is no 
+wait time. Thus by splitting the list into more and more sub lists, we 
+can increase performance since we can have more threads working in 
+parallel.
+
+As the number of lists continues to increase, we can assume that the 
+throughput will also continue to increase for the above reason. This 
+will be true at least until we have so many lists that it is equivalent
+to the number of iterations. This would cause an average of 1 
+SortedListElement_t per list at which point we are just operating a 
+standard, very large list with the additional overheads of sublists.
+As we get closer and closer to this point the throughput increases 
+less and less. 
+
+It is reasonable to suggest that the throughput of an N-way partitioned
+list should be equivalent to the throughput of a single linked list 
+with fewer (1/N) threads because the graphs seem to indicate that.
+It less so for the spin lock graph (lab2b_5.png) but still close. 
