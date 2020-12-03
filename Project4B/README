@@ -1,0 +1,14 @@
+#NAME: Dhanush Nadella
+#EMAIL: dnadella787@gmail.com
+#UID: 205150583 
+
+Included Files: 
+
+all relavent research included in the file it was used in
+
+lab4b.c - implements the temperature and time logging as required by the spec 
+		  using the mraa library on the beaglebone green
+Makefile - supports default, clean, check, and dist targets 
+README - this file
+test.sh - bash script that is used by check target for smoke test 
+

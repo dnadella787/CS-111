@@ -1,0 +1,8 @@
+NAME: Dhanush Nadella,Jeremy Tsujihara
+ID: 205150583,505311626
+EMAIL: dnadella787@gmail.com,jtsujihara@ucla.edu
+
+Included Files:
+lab3a.c - C source that summarizes an EXT2 Image.
+Makefile - builds program, creates tarball, and cleans the directory.
+README - this file
