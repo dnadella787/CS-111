@@ -1,0 +1,9 @@
+NAME: Dhanush Nadella,Jeremy Tsujihara
+ID: 205150583,505311626
+EMAIL: dnadella787@gmail.com,jtsujihara@ucla.edu
+
+Included Files:
+lab3b.py - python source module that reports inconsistencies on a file system summary.
+Makefile - produced executable, creates tarball, and cleans directory.
+README - This file.
+build.sh - shell script to be linked to lab3b executable

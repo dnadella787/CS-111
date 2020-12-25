@@ -1,0 +1,10 @@
+#NAME: Dhanush Nadella
+#EMAIL: dnadella787@gmail.com
+#UID: 205150583
+
+Included Files:
+
+lab4c_tcp.c - c source file that sets up tcp connection to server and processes commands as per spec
+lab4c_tls.c - c source file that setes up SSL connection to server and processes commands as per spec
+README - this file
+Makefile - supports default, dist, and clean target. Default builds the two executables.
