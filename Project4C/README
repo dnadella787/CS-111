@@ -2,9 +2,12 @@
 #EMAIL: dnadella787@gmail.com
 #UID: 205150583
 
+Program is an extension of 4b in that the original functionality is still there but now
+there is a tcp connection involved. 
+
 Included Files:
 
-lab4c_tcp.c - c source file that sets up tcp connection to server and processes commands as per spec
-lab4c_tls.c - c source file that setes up SSL connection to server and processes commands as per spec
+lab4c_tcp.c - c source file that sets up tcp connection to server and processes commands similar to project 4b.
+lab4c_tls.c - c source file that setes up SSL connection to server and processes commands similar to project 4b.
 README - this file
 Makefile - supports default, dist, and clean target. Default builds the two executables.
