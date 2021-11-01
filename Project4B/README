@@ -6,8 +6,21 @@ Included Files:
 
 all relavent research included in the file it was used in
 
-lab4b.c - implements the temperature and time logging as required by the spec 
-		  using the mraa library on the beaglebone green
+lab4b.c - implements temperature logging (in F or C) at a given interval. 
+		  The output log can also be appended to an actual file using the 
+		  --log=filename option. Other options that are included are --scale=C (or F)
+		  and --period=number.The program also accepts commands via stdin that all 
+		  do various things such as:
+		  	- SCALE=F -- changes temperature logging to Fahrenheit
+			- SCALE=C -- changes temperature logging to Celcius
+			- PERIOD=seconds -- change the interval
+			- STOP -- program stops
+			- START -- resume generating reports (given it stopped)
+			- LOG lineoftext -- simply log LOG lineoftext to stdin/filename
+			- OFF -- stops the program completely and exits
+		In addition it takes a button input that will also act as the OFF
+		command.
+		
 Makefile - supports default, clean, check, and dist targets 
 README - this file
 test.sh - bash script that is used by check target for smoke test 
